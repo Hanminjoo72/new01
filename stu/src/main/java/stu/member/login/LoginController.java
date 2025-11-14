@@ -69,8 +69,21 @@ public class LoginController {
 				session.setAttribute("SESSION_ID", chk.get("MEMBER_ID"));
 				session.setAttribute("SESSION_NO", chk.get("MEMBER_NO"));
 				session.setAttribute("SESSION_NAME", chk.get("MEMBER_NAME"));
+				
+	            // ✨ 추가 1: MEMBER_GRADE를 세션에 저장합니다.
+				session.setAttribute("SESSION_GRADE", chk.get("MEMBER_GRADE")); 
 
-				mv = new ModelAndView("redirect:/main.do");
+				String memberGrade = (String) chk.get("MEMBER_GRADE");
+
+	            // ✨ 추가 2: 회원 등급에 따라 리다이렉트 경로를 분기합니다.
+				if ("ADMIN".equals(memberGrade)) {
+					// ADMIN 등급이면 관리자 페이지로 리다이렉트
+					mv = new ModelAndView("redirect:/adminEventList.do"); 
+				} else {
+					// 일반 등급이면 메인 페이지로 리다이렉트
+					mv = new ModelAndView("redirect:/main.do");
+				}
+				
 				mv.addObject("MEMBER", chk);
 
 				session.getMaxInactiveInterval();
@@ -78,7 +91,6 @@ public class LoginController {
 			return mv;
 		}
 	}
-
 	// 소셜로그인 이후 메인페이지 이동
 	// VULNERABLE: Session Fixation 취약점 - 로그인 시 세션 ID 재생성 안함 (CTF용)
 	@RequestMapping(value = "/socialLoginAction.do", method = RequestMethod.POST)
